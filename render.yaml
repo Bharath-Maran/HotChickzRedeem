@@ -2,8 +2,9 @@ services:
   - type: web
     name: hotchickz-api
     env: python
-    region: ohio         # closest to Fort Wayne, IN
+    region: ohio           # closest to Fort Wayne, IN
     plan: free
+    rootDir: backend       # Render runs all commands from this subdirectory
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
