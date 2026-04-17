@@ -14,8 +14,42 @@ export default function ClaimedScreen() {
   return (
     <div className="screen">
       <div className="brand-header">
-        <h1>🔥 Hot Chickz</h1>
-        <p>Redemption Complete</p>
+        <div className="brand-name">🔥 Hot Chickz</div>
+        <div className="brand-tagline">Redemption Complete</div>
+      </div>
+
+      <div className="steps">
+        <div className="step">
+          <div className="step-dot done">✓</div>
+          <div className="step-label done">Claim</div>
+        </div>
+        <div className="step-line" />
+        <div className="step">
+          <div className="step-dot done">✓</div>
+          <div className="step-label done">Visit</div>
+        </div>
+        <div className="step-line" />
+        <div className="step">
+          <div className="step-dot done">✓</div>
+          <div className="step-label done">Enjoy</div>
+        </divline">Redemption Complete</div>
+      </div>
+
+      <div className="steps">
+        <div className="step">
+          <div className="step-dot done">✓</div>
+          <div className="step-label done">Claim</div>
+        </div>
+        <div className="step-line" />
+        <div className="step">
+          <div className="step-dot done">✓</div>
+          <div className="step-label done">Visit</div>
+        </div>
+        <div className="step-line" />
+        <div className="step">
+          <div className="step-dot done">✓</div>
+          <div className="step-label done">Enjoy</div>
+        </div>
       </div>
 
       <div className="status-icon">✅</div>
@@ -38,6 +72,10 @@ export default function ClaimedScreen() {
             <span>Complimentary</span>
           </div>
           <div className="receipt-row">
+
+      <div className="location-chip">
+        📍 1716 E Pontiac St, Fort Wayne, IN 46803
+      </div>
             <span>Date</span>
             <span>{dateStr}</span>
           </div>
@@ -54,6 +92,10 @@ export default function ClaimedScreen() {
 
       <div className="card">
         <p>🙏 Thank you for visiting Hot Chickz! We hope you love your slider.</p>
+      </div>
+
+      <div className="location-chip">
+        📍 1716 E Pontiac St, Fort Wayne, IN 46803
       </div>
     </div>
   )

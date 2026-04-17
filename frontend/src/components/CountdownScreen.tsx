@@ -44,8 +44,42 @@ export default function CountdownScreen({ expiresAt, onRedeem }: Props) {
   return (
     <div className="screen">
       <div className="brand-header">
-        <h1>🔥 Hot Chickz</h1>
-        <p>Your Offer is Active</p>
+        <div className="brand-name">🔥 Hot Chickz</div>
+        <div className="brand-tagline">Your Offer is Active</div>
+      </div>
+
+      <div className="steps">
+        <div className="step">
+          <div className="step-dot done">✓</div>
+          <div className="step-label done">Claim</div>
+        </div>
+        <div className="step-line" />
+        <div className="step">
+          <div className="step-dot active">2</div>
+          <div className="step-label active">Visit</div>
+        </div>
+        <div className="step-line" />
+        <div className="step">
+          <div className="step-dot">3</div>
+          <div className="step-label">Enjoy</div>
+        </divine">Your Offer is Active</div>
+      </div>
+
+      <div className="steps">
+        <div className="step">
+          <div className="step-dot done">✓</div>
+          <div className="step-label done">Claim</div>
+        </div>
+        <div className="step-line" />
+        <div className="step">
+          <div className="step-dot active">2</div>
+          <div className="step-label active">Visit</div>
+        </div>
+        <div className="step-line" />
+        <div className="step">
+          <div className="step-dot">3</div>
+          <div className="step-label">Enjoy</div>
+        </div>
       </div>
 
       <div className="countdown-card">
@@ -56,7 +90,11 @@ export default function CountdownScreen({ expiresAt, onRedeem }: Props) {
             <span className="time-label">Days</span>
           </div>
           <span className="time-colon">:</span>
-          <div className="time-unit">
+          <div classNalocation-chip">
+        📍 1716 E Pontiac St, Fort Wayne, IN 46803
+      </div>
+
+      <div className="me="time-unit">
             <span className="time-value">{pad(timeLeft.hours)}</span>
             <span className="time-label">Hrs</span>
           </div>
@@ -71,6 +109,10 @@ export default function CountdownScreen({ expiresAt, onRedeem }: Props) {
             <span className="time-label">Sec</span>
           </div>
         </div>
+      </div>
+
+      <div className="location-chip">
+        📍 1716 E Pontiac St, Fort Wayne, IN 46803
       </div>
 
       <div className="card">
