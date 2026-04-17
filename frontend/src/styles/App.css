@@ -1,0 +1,373 @@
+/* ─── Reset & base ─────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(160deg, #1a0a00 0%, #2d1200 55%, #1a0a00 100%);
+  min-height: 100dvh;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* ─── Screen wrapper ────────────────────────────────────────────────────────── */
+.screen {
+  width: 100%;
+  max-width: 440px;
+  min-height: 100dvh;
+  padding: 32px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+/* ─── Brand header ──────────────────────────────────────────────────────────── */
+.brand-header {
+  text-align: center;
+  width: 100%;
+}
+
+.brand-header h1 {
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: #ff6b00;
+  text-shadow: 0 2px 12px rgba(255, 107, 0, 0.45);
+  letter-spacing: 1px;
+  line-height: 1.1;
+}
+
+.brand-header p {
+  font-size: 1rem;
+  color: #ffd4a0;
+  margin-top: 4px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+/* ─── Offer badge ───────────────────────────────────────────────────────────── */
+.offer-badge {
+  background: linear-gradient(135deg, #ff4500, #ff6b00);
+  border-radius: 50%;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.8rem;
+  box-shadow: 0 6px 28px rgba(255, 69, 0, 0.55);
+  flex-shrink: 0;
+}
+
+/* ─── Generic card ──────────────────────────────────────────────────────────── */
+.card {
+  background: rgba(255, 107, 0, 0.09);
+  border: 1px solid rgba(255, 107, 0, 0.28);
+  border-radius: 18px;
+  padding: 24px 20px;
+  width: 100%;
+  text-align: center;
+}
+
+.card h2 {
+  font-size: 1.55rem;
+  color: #ff6b00;
+  margin-bottom: 10px;
+  line-height: 1.25;
+}
+
+.card p {
+  color: #ffd4a0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* ─── Divider ───────────────────────────────────────────────────────────────── */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: rgba(255, 107, 0, 0.22);
+  margin: 12px 0;
+}
+
+/* ─── Offer detail rows ─────────────────────────────────────────────────────── */
+.offer-details {
+  text-align: center;
+  width: 100%;
+}
+
+.offer-details p {
+  color: #ffd4a0;
+  font-size: 0.9rem;
+  margin: 5px 0;
+}
+
+/* ─── Countdown timer ───────────────────────────────────────────────────────── */
+.countdown-card {
+  background: rgba(255, 107, 0, 0.09);
+  border: 1px solid rgba(255, 107, 0, 0.28);
+  border-radius: 18px;
+  padding: 28px 20px;
+  width: 100%;
+  text-align: center;
+}
+
+.countdown-card h2 {
+  font-size: 1.05rem;
+  color: #ffd4a0;
+  font-weight: 500;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.timer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 6px;
+}
+
+.time-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 58px;
+}
+
+.time-value {
+  font-size: 2.8rem;
+  font-weight: 900;
+  color: #ff6b00;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 2px 8px rgba(255, 107, 0, 0.35);
+}
+
+.time-label {
+  font-size: 0.62rem;
+  color: #ffd4a0;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-top: 6px;
+}
+
+.time-colon {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #ff6b00;
+  line-height: 1;
+  padding-top: 2px;
+  opacity: 0.7;
+}
+
+/* ─── Buttons ───────────────────────────────────────────────────────────────── */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 17px 24px;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+  letter-spacing: 0.4px;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #ff4500, #ff6b00);
+  color: #fff;
+  box-shadow: 0 4px 22px rgba(255, 69, 0, 0.48);
+}
+
+.btn-primary:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(255, 69, 0, 0.65);
+}
+
+.btn-primary:not(:disabled):active {
+  transform: translateY(0);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #2e7d32, #4caf50);
+  color: #fff;
+  box-shadow: 0 4px 20px rgba(76, 175, 80, 0.38);
+}
+
+.btn-success:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(76, 175, 80, 0.55);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #ffd4a0;
+  border: 1px solid rgba(255, 212, 160, 0.28);
+}
+
+.btn-secondary:not(:disabled):hover {
+  background: rgba(255, 212, 160, 0.06);
+}
+
+/* ─── Confirmation modal ────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  backdrop-filter: blur(3px);
+}
+
+.modal {
+  background: #2d1200;
+  border: 1px solid rgba(255, 107, 0, 0.38);
+  border-radius: 22px;
+  padding: 36px 28px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+
+.modal h2 {
+  font-size: 1.45rem;
+  color: #ff6b00;
+  margin-bottom: 14px;
+}
+
+.modal p {
+  color: #ffd4a0;
+  font-size: 0.92rem;
+  margin-bottom: 28px;
+  line-height: 1.65;
+}
+
+.modal p strong {
+  color: #fff;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ─── Status icon ───────────────────────────────────────────────────────────── */
+.status-icon {
+  font-size: 4.5rem;
+  text-align: center;
+  line-height: 1;
+}
+
+/* ─── Claimed receipt box ───────────────────────────────────────────────────── */
+.receipt-box {
+  background: rgba(46, 125, 50, 0.1);
+  border: 1px solid rgba(76, 175, 80, 0.35);
+  border-radius: 18px;
+  padding: 28px 22px;
+  width: 100%;
+  text-align: center;
+}
+
+.receipt-box h2 {
+  color: #4caf50;
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.receipt-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #ffd4a0;
+  padding: 5px 0;
+  border-bottom: 1px solid rgba(255, 212, 160, 0.1);
+  text-align: left;
+}
+
+.receipt-row:last-child {
+  border-bottom: none;
+}
+
+.receipt-row span:first-child {
+  color: rgba(255, 212, 160, 0.65);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ─── Expired box ───────────────────────────────────────────────────────────── */
+.expired-box {
+  background: rgba(183, 28, 28, 0.1);
+  border: 1px solid rgba(183, 28, 28, 0.3);
+  border-radius: 18px;
+  padding: 28px 22px;
+  width: 100%;
+  text-align: center;
+}
+
+.expired-box h2 {
+  color: #ef5350;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+
+.expired-box p {
+  color: #ffd4a0;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+/* ─── Loading screen ────────────────────────────────────────────────────────── */
+.loading-screen {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.loading-screen p {
+  color: #ffd4a0;
+  font-size: 0.95rem;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 107, 0, 0.15);
+  border-top-color: #ff6b00;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
