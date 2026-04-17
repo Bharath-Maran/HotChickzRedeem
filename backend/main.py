@@ -25,7 +25,13 @@ load_dotenv()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-DATABASE_URL: str = os.environ["DATABASE_URL"]  # fail fast if missing
+DATABASE_URL: str = os.environ.get("DATABASE_URL", "")
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL environment variable is not set. "
+        "Add it in your Render dashboard → Environment."
+    )
+
 USE_SSL: bool = os.getenv("USE_SSL", "true").lower() == "true"
 ALLOWED_ORIGINS: list[str] = [
     o.strip()
