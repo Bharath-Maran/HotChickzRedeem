@@ -32,7 +32,10 @@ DATABASE_URL: str = os.environ.get("DATABASE_URL", "")
 USE_SSL: bool = os.getenv("USE_SSL", "true").lower() == "true"
 ALLOWED_ORIGINS: list[str] = [
     o.strip()
-    for o in os.getenv("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+    for o in os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:5173,https://hotchickzoffer.com"
+    ).split(",")
     if o.strip()
 ]
 
@@ -205,6 +208,28 @@ async def start_timer(payload: ContactPayload):
             payload.contact_id,
         )
         return {"status": "active_timer", "expires_at": row["expires_at"].isoformat()}
+
+
+@app.post("/api/register")
+async def register(payload: ContactPayload):
+    """
+    Pre-register a code with a 7-day expiry window.
+    Called by the GHL workflow webhook when the SMS/email is sent.
+    Idempotent — safe to call multiple times for the same contact.
+    """
+    db = _require_pool()
+
+    async with db.acquire() as conn:
+        await conn.execute(
+            """
+            INSERT INTO slider_claims (contact_id, status, timer_started_at, expires_at)
+            VALUES ($1, 'active_timer', NOW(), NOW() + INTERVAL '7 days')
+            ON CONFLICT (contact_id) DO NOTHING
+            """,
+            payload.contact_id,
+        )
+
+    return {"status": "registered", "expires_in_days": 7}
 
 
 @app.post("/api/redeem")
