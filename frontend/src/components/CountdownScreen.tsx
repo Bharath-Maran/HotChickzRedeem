@@ -62,23 +62,6 @@ export default function CountdownScreen({ expiresAt, onRedeem }: Props) {
         <div className="step">
           <div className="step-dot">3</div>
           <div className="step-label">Enjoy</div>
-        </divine">Your Offer is Active</div>
-      </div>
-
-      <div className="steps">
-        <div className="step">
-          <div className="step-dot done">✓</div>
-          <div className="step-label done">Claim</div>
-        </div>
-        <div className="step-line" />
-        <div className="step">
-          <div className="step-dot active">2</div>
-          <div className="step-label active">Visit</div>
-        </div>
-        <div className="step-line" />
-        <div className="step">
-          <div className="step-dot">3</div>
-          <div className="step-label">Enjoy</div>
         </div>
       </div>
 
@@ -90,11 +73,7 @@ export default function CountdownScreen({ expiresAt, onRedeem }: Props) {
             <span className="time-label">Days</span>
           </div>
           <span className="time-colon">:</span>
-          <div classNalocation-chip">
-        📍 1716 E Pontiac St, Fort Wayne, IN 46803
-      </div>
-
-      <div className="me="time-unit">
+          <div className="time-unit">
             <span className="time-value">{pad(timeLeft.hours)}</span>
             <span className="time-label">Hrs</span>
           </div>
@@ -119,14 +98,9 @@ export default function CountdownScreen({ expiresAt, onRedeem }: Props) {
         <p>🍗 <strong>1× FREE Chicken Slider</strong></p>
         <div className="divider" />
         <p style={{ fontSize: '0.85rem' }}>
-          When you're at the register, tap the button below to complete your
+          When you are at the register, tap the button below to complete your
           redemption. This action cannot be undone.
         </p>
-      </div>
-
-      <div className="offer-details">
-        <p>📍 1716 E Pontiac St, Fort Wayne, IN</p>
-        <p>🔒 One-time use only</p>
       </div>
 
       <button className="btn btn-primary" onClick={() => setShowModal(true)}>

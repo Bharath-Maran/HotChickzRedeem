@@ -32,23 +32,6 @@ export default function ClaimedScreen() {
         <div className="step">
           <div className="step-dot done">✓</div>
           <div className="step-label done">Enjoy</div>
-        </divline">Redemption Complete</div>
-      </div>
-
-      <div className="steps">
-        <div className="step">
-          <div className="step-dot done">✓</div>
-          <div className="step-label done">Claim</div>
-        </div>
-        <div className="step-line" />
-        <div className="step">
-          <div className="step-dot done">✓</div>
-          <div className="step-label done">Visit</div>
-        </div>
-        <div className="step-line" />
-        <div className="step">
-          <div className="step-dot done">✓</div>
-          <div className="step-label done">Enjoy</div>
         </div>
       </div>
 
@@ -65,17 +48,13 @@ export default function ClaimedScreen() {
         <div style={{ marginTop: 14 }}>
           <div className="receipt-row">
             <span>Item</span>
-            <span>FREE Chicken Slider ×1</span>
+            <span>FREE Chicken Slider x1</span>
           </div>
           <div className="receipt-row">
             <span>Value</span>
             <span>Complimentary</span>
           </div>
           <div className="receipt-row">
-
-      <div className="location-chip">
-        📍 1716 E Pontiac St, Fort Wayne, IN 46803
-      </div>
             <span>Date</span>
             <span>{dateStr}</span>
           </div>
