@@ -10,9 +10,10 @@ POST /api/start-timer           Begin the 7-day claim window
 POST /api/redeem                Complete the redemption at the register
 """
 
+import logging
 import os
 import re
-import ssl as _ssl
+import sys
 from contextlib import asynccontextmanager
 
 import asyncpg
@@ -21,17 +22,14 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
+logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+log = logging.getLogger("hotchickz")
+
 load_dotenv()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
 DATABASE_URL: str = os.environ.get("DATABASE_URL", "")
-if not DATABASE_URL:
-    raise RuntimeError(
-        "DATABASE_URL environment variable is not set. "
-        "Add it in your Render dashboard → Environment."
-    )
-
 USE_SSL: bool = os.getenv("USE_SSL", "true").lower() == "true"
 ALLOWED_ORIGINS: list[str] = [
     o.strip()
@@ -50,11 +48,28 @@ pool: asyncpg.Pool | None = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global pool
-    ssl_param: str | bool = "require" if USE_SSL else False
-    pool = await asyncpg.create_pool(DATABASE_URL, ssl=ssl_param, min_size=1, max_size=5)
+
+    if not DATABASE_URL:
+        log.error("STARTUP FAILED: DATABASE_URL environment variable is not set.")
+        log.error("Add DATABASE_URL in Render → your service → Environment tab.")
+        sys.exit(1)
+
+    log.info("Connecting to database...")
+    try:
+        ssl_param = "require" if USE_SSL else False
+        pool = await asyncpg.create_pool(
+            DATABASE_URL, ssl=ssl_param, min_size=1, max_size=5
+        )
+        log.info("Database pool ready.")
+    except Exception as exc:
+        log.error("STARTUP FAILED: could not connect to database: %s", exc)
+        sys.exit(1)
+
     yield
+
     if pool:
         await pool.close()
+        log.info("Database pool closed.")
 
 
 # ── App ───────────────────────────────────────────────────────────────────────
