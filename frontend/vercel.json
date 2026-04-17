@@ -1,4 +1,3 @@
-# Vercel SPA routing — all paths served by index.html
 {
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
