@@ -13,7 +13,6 @@ POST /api/redeem                Complete the redemption at the register
 import logging
 import os
 import re
-import sys
 from contextlib import asynccontextmanager
 
 import asyncpg
@@ -50,26 +49,26 @@ async def lifespan(app: FastAPI):
     global pool
 
     if not DATABASE_URL:
-        log.error("STARTUP FAILED: DATABASE_URL environment variable is not set.")
-        log.error("Add DATABASE_URL in Render → your service → Environment tab.")
-        sys.exit(1)
+        print("STARTUP FAILED: DATABASE_URL environment variable is not set.", flush=True)
+        print("Go to Render → your service → Environment tab and add DATABASE_URL.", flush=True)
+        raise RuntimeError("DATABASE_URL not set")
 
-    log.info("Connecting to database...")
+    print(f"Connecting to database (SSL={USE_SSL})...", flush=True)
     try:
         ssl_param = "require" if USE_SSL else False
         pool = await asyncpg.create_pool(
             DATABASE_URL, ssl=ssl_param, min_size=1, max_size=5
         )
-        log.info("Database pool ready.")
+        print("Database pool ready. Starting server.", flush=True)
     except Exception as exc:
-        log.error("STARTUP FAILED: could not connect to database: %s", exc)
-        sys.exit(1)
+        print(f"STARTUP FAILED: could not connect to database: {exc}", flush=True)
+        raise
 
     yield
 
     if pool:
         await pool.close()
-        log.info("Database pool closed.")
+        print("Database pool closed.", flush=True)
 
 
 # ── App ───────────────────────────────────────────────────────────────────────

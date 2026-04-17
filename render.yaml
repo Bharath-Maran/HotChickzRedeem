@@ -5,6 +5,7 @@ services:
     region: ohio           # closest to Fort Wayne, IN
     plan: free
     rootDir: backend       # Render runs all commands from this subdirectory
+    pythonVersion: "3.11.9"
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
