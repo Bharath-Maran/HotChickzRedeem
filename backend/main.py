@@ -224,7 +224,11 @@ async def register(payload: ContactPayload):
             """
             INSERT INTO slider_claims (contact_id, status, timer_started_at, expires_at)
             VALUES ($1, 'active_timer', NOW(), NOW() + INTERVAL '7 days')
-            ON CONFLICT (contact_id) DO NOTHING
+            ON CONFLICT (contact_id) DO UPDATE
+              SET status           = 'active_timer',
+                  timer_started_at = NOW(),
+                  expires_at       = NOW() + INTERVAL '7 days'
+            WHERE slider_claims.status = 'unclaimed'
             """,
             payload.contact_id,
         )
