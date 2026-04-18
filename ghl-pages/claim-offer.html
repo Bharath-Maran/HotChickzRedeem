@@ -43,16 +43,19 @@
 ═══════════════════════════════════════════════════════════════════ */
 html { scroll-behavior: smooth; }
 
+html {
+  background-color: #09030a;
+}
+
 body {
-  background: var(--bg);
-  color: var(--text);
-  font-family: 'Nunito', sans-serif;
-  min-height: 100vh;
-  /* Subtle radial ambient glow at the top */
+  background-color: #09030a;
   background-image:
     radial-gradient(ellipse 80% 40% at 50% 0%, #ff550018 0%, transparent 70%),
     radial-gradient(ellipse 60% 30% at 50% 100%, #3d002012 0%, transparent 60%);
   background-attachment: fixed;
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  min-height: 100vh;
   -webkit-font-smoothing: antialiased;
 }
 
