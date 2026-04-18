@@ -77,6 +77,7 @@ body::before {
   align-items: center;
   gap: 22px;
   text-align: center;
+  overflow-x: hidden;   /* keep slide animations from causing horizontal scroll */
   /* Entrance animation */
   animation: fadeUp 0.45s var(--transition) both;
 }
@@ -1176,6 +1177,19 @@ async function confirmRedeem() {
 /* ── Init: load offer status and render correct state ─────────────────────── */
 
 async function init() {
+  // ── Dev preview bypass: ?debug=unclaimed|active|claimed|expired|invalid ──
+  const debugState = params.get('debug')
+  if (debugState) {
+    const validStates = ['unclaimed','active','claimed','expired','invalid']
+    if (validStates.includes(debugState)) {
+      show('s-' + (debugState === 'active' ? 'active' : debugState))
+      if (debugState === 'active') {
+        startCountdown(new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString())
+      }
+      return
+    }
+  }
+
   show('s-loading')
 
   if (!code) {
