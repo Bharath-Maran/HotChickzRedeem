@@ -4,10 +4,13 @@ FastAPI + asyncpg  •  Supabase (PostgreSQL) backend
 
 Endpoints
 ---------
-GET  /health                    Health check
-GET  /api/claim-status?code=…   Query current redemption state
-POST /api/start-timer           Begin the 7-day claim window
-POST /api/redeem                Complete the redemption at the register
+GET  /health                         Health check
+GET  /api/claim-status?code=…        Query current redemption state
+GET  /api/offer-status?code=…        Alias (spec name) — same as claim-status
+POST /api/start-timer                Begin the 7-day claim window
+POST /api/register                   GHL webhook: pre-register + activate code
+POST /api/redeem                     Complete the redemption at the register
+POST /api/redeem-offer               Alias (spec name) — same as redeem
 """
 
 import logging
@@ -208,6 +211,22 @@ async def start_timer(payload: ContactPayload):
             payload.contact_id,
         )
         return {"status": "active_timer", "expires_at": row["expires_at"].isoformat()}
+
+
+@app.get("/api/offer-status")
+async def offer_status(code: str = Query(..., max_length=255)):
+    """
+    Alias for /api/claim-status — used by the GHL funnel page.
+    """
+    return await claim_status(code=code)
+
+
+@app.post("/api/redeem-offer")
+async def redeem_offer(payload: ContactPayload):
+    """
+    Alias for /api/redeem — used by the GHL funnel page.
+    """
+    return await redeem(payload)
 
 
 @app.post("/api/register")

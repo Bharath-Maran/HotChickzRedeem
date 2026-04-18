@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Hot Chickz — Claim Your Slider</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d0400;
+    color: #f5ede6;
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  /* ── Layout ─────────────────────────────────────────────────────── */
+  .screen {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 36px 20px 60px;
+    display: none;              /* JS controls visibility */
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    text-align: center;
+  }
+
+  /* ── Brand ──────────────────────────────────────────────────────── */
+  .brand-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.4rem;
+    color: #ff5500;
+    text-shadow: 0 0 24px #ff550088;
+    letter-spacing: 2px;
+  }
+  .brand-tagline { font-size: 0.85rem; color: #c97a55; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── Step indicator ─────────────────────────────────────────────── */
+  .steps { display: flex; align-items: center; gap: 6px; }
+  .step  { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .step-dot {
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 900;
+    background: #2a1500; color: #6b3a1f; border: 2px solid #3d1f00;
+  }
+  .step-dot.active { background: #ff5500; color: #fff; border-color: #ff5500; }
+  .step-dot.done   { background: #2d6a4f; color: #fff; border-color: #2d6a4f; }
+  .step-label { font-size: 0.65rem; color: #6b3a1f; text-transform: uppercase; letter-spacing: 0.5px; }
+  .step-label.active { color: #ff5500; font-weight: 700; }
+  .step-label.done   { color: #52b788; }
+  .step-line { width: 28px; height: 2px; background: #3d1f00; margin-bottom: 14px; }
+
+  /* ── Voucher card ───────────────────────────────────────────────── */
+  .offer-badge { font-size: 3.5rem; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+
+  .voucher { width: 100%; border: 2px dashed #ff5500; border-radius: 16px; overflow: hidden; }
+  .voucher-header {
+    background: #ff5500; padding: 20px 16px 16px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  .free-label { font-size: 0.75rem; color: #fff8; letter-spacing: 2px; text-transform: uppercase; }
+  .item-name  { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: #fff; letter-spacing: 2px; }
+  .voucher-body { padding: 18px 20px; background: #1a0800; }
+  .voucher-body p { font-size: 0.88rem; line-height: 1.6; color: #c97a55; }
+
+  /* ── Location chip ──────────────────────────────────────────────── */
+  .location-chip {
+    font-size: 0.8rem; color: #c97a55;
+    background: #1a0800; border: 1px solid #3d1f00;
+    border-radius: 999px; padding: 8px 18px;
+  }
+
+  /* ── Countdown timer ────────────────────────────────────────────── */
+  .expires-label { font-size: 0.78rem; color: #6b3a1f; text-transform: uppercase; letter-spacing: 1px; }
+  .countdown { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .time-unit { display: flex; flex-direction: column; align-items: center; }
+  .time-value {
+    font-family: 'Bebas Neue', sans-serif; font-size: 3rem;
+    color: #ff5500; line-height: 1; min-width: 64px;
+  }
+  .time-label { font-size: 0.65rem; color: #6b3a1f; letter-spacing: 1px; text-transform: uppercase; }
+  .time-colon {
+    font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem;
+    color: #3d1f00; margin-bottom: 14px;
+  }
+
+  /* ── Buttons ────────────────────────────────────────────────────── */
+  .btn {
+    width: 100%; padding: 16px; border-radius: 12px; border: none;
+    font-family: 'Nunito', sans-serif; font-size: 1rem; font-weight: 900;
+    cursor: pointer; letter-spacing: 0.5px; transition: opacity 0.2s;
+  }
+  .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+  .btn-primary  { background: #ff5500; color: #fff; }
+  .btn-primary:hover:not(:disabled) { background: #ff6622; }
+
+  /* ── Fine print ─────────────────────────────────────────────────── */
+  .fine-print { font-size: 0.75rem; color: #6b3a1f; line-height: 1.7; }
+
+  /* ── Status cards (invalid / expired) ──────────────────────────── */
+  .status-card {
+    width: 100%; background: #1a0800; border: 1px solid #3d1f00;
+    border-radius: 16px; padding: 24px;
+  }
+  .status-card h2 { color: #ffcf9e; margin-bottom: 10px; font-size: 1.3rem; }
+  .status-card p  { color: #c97a55; font-size: 0.9rem; line-height: 1.6; }
+  .status-icon { font-size: 3.5rem; }
+
+  /* ── Receipt (claimed) ──────────────────────────────────────────── */
+  .receipt-box {
+    width: 100%; background: #1a0800; border: 1px solid #3d1f00;
+    border-radius: 16px; padding: 24px; text-align: left;
+  }
+  .receipt-box h2 { color: #38b46a; margin-bottom: 6px; font-size: 1.4rem; }
+  .receipt-box > p { color: #c97a55; font-size: 0.88rem; margin-bottom: 18px; }
+  .divider { height: 1px; background: #3d1f00; margin: 14px 0; }
+  .receipt-row {
+    display: flex; justify-content: space-between;
+    padding: 8px 0; border-bottom: 1px solid #2a1200; font-size: 0.85rem;
+  }
+  .receipt-row span:first-child { color: #6b3a1f; }
+  .receipt-row:last-child { border-bottom: none; }
+
+  /* ── Confirm modal (State 3) ────────────────────────────────────── */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.88);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 100; padding: 20px;
+  }
+  .modal {
+    background: #1a0800; border: 1px solid #ff5500; border-radius: 20px;
+    padding: 32px 24px; max-width: 360px; width: 100%; text-align: center;
+  }
+  .modal h2 { color: #ff5500; margin-bottom: 12px; font-size: 1.3rem; }
+  .modal p  { font-size: 0.9rem; color: #c97a55; margin-bottom: 24px; line-height: 1.6; }
+  .modal-btn { width: 100%; padding: 14px; border-radius: 10px; border: none; font-size: 1rem; font-weight: 800; cursor: pointer; margin-top: 8px; }
+  .modal-confirm { background: #ff5500; color: #fff; }
+  .modal-cancel  { background: #2a1500; color: #c97a55; }
+
+  /* ── Loading spinner ────────────────────────────────────────────── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 3px solid #3d1f00; border-top-color: #ff5500;
+    animation: spin 0.8s linear infinite;
+    margin: 16px auto;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── STATE: LOADING ─────────────────────────────────────────────────────── -->
+<div id="s-loading" class="screen">
+  <div class="brand-name">🔥 Hot Chickz</div>
+  <div class="brand-tagline">Loading your offer…</div>
+  <div class="spinner"></div>
+</div>
+
+<!-- ── STATE 1: UNCLAIMED (Landing with Claim button) ────────────────────── -->
+<div id="s-unclaimed" class="screen">
+  <div class="brand-name">🔥 Hot Chickz</div>
+  <div class="brand-tagline">Fort Wayne, Indiana</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-dot active">1</div>
+      <div class="step-label active">Claim</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-dot">2</div>
+      <div class="step-label">Visit</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-dot">3</div>
+      <div class="step-label">Enjoy</div>
+    </div>
+  </div>
+
+  <div class="offer-badge">🍗</div>
+
+  <div class="voucher">
+    <div class="voucher-header">
+      <span class="free-label">— One Complimentary —</span>
+      <span class="item-name">Chicken Slider</span>
+    </div>
+    <div class="voucher-body">
+      <p>
+        Tap <strong style="color:#fff">Claim Offer</strong> to start your
+        7&#8209;day redemption window. You'll have 7 days to visit and show
+        this screen at the register.
+      </p>
+    </div>
+  </div>
+
+  <div class="location-chip">📍 1716 E Pontiac St, Fort Wayne, IN 46803</div>
+
+  <button id="btn-claim" class="btn btn-primary" onclick="claimOffer()">
+    🔥 Claim Offer
+  </button>
+
+  <p class="fine-print">
+    Dine-in only &nbsp;·&nbsp; One per customer &nbsp;·&nbsp; Cannot be combined with other offers<br />
+    Timer starts when you tap Claim Offer &nbsp;·&nbsp; Valid for 7 days
+  </p>
+</div>
+
+<!-- ── STATE 2: ACTIVE TIMER (Countdown) ─────────────────────────────────── -->
+<div id="s-active" class="screen">
+  <div class="brand-name">🔥 Hot Chickz</div>
+  <div class="brand-tagline">Your Offer is Active</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-dot done">✓</div>
+      <div class="step-label done">Claim</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-dot active">2</div>
+      <div class="step-label active">Visit</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-dot">3</div>
+      <div class="step-label">Enjoy</div>
+    </div>
+  </div>
+
+  <div class="voucher">
+    <div class="voucher-header">
+      <span class="free-label">— One Complimentary —</span>
+      <span class="item-name">Chicken Slider</span>
+    </div>
+    <div class="voucher-body">
+      <p>Show this screen at the register. Tap the button below <strong style="color:#fff">only when the cashier is ready</strong>.</p>
+    </div>
+  </div>
+
+  <p class="expires-label">Expires in</p>
+  <div class="countdown">
+    <div class="time-unit">
+      <span class="time-value" id="t-days">00</span>
+      <span class="time-label">Days</span>
+    </div>
+    <span class="time-colon">:</span>
+    <div class="time-unit">
+      <span class="time-value" id="t-hours">00</span>
+      <span class="time-label">Hrs</span>
+    </div>
+    <span class="time-colon">:</span>
+    <div class="time-unit">
+      <span class="time-value" id="t-mins">00</span>
+      <span class="time-label">Min</span>
+    </div>
+    <span class="time-colon">:</span>
+    <div class="time-unit">
+      <span class="time-value" id="t-secs">00</span>
+      <span class="time-label">Sec</span>
+    </div>
+  </div>
+
+  <div class="location-chip">📍 1716 E Pontiac St, Fort Wayne, IN 46803</div>
+
+  <button class="btn btn-primary" onclick="openRedeemModal()">
+    ✅ I'm at the Register — Redeem Now
+  </button>
+
+  <p class="fine-print">Dine-in only &nbsp;·&nbsp; One per customer &nbsp;·&nbsp; Cannot be combined with other offers</p>
+</div>
+
+<!-- ── STATE 3: SAFEGUARD MODAL (overlays State 2) ───────────────────────── -->
+<div class="modal-overlay" id="modal-redeem">
+  <div class="modal">
+    <h2>Redeem Your Slider?</h2>
+    <p>
+      Are you currently at the register?<br />
+      Only confirm this in front of the cashier.<br /><br />
+      <strong style="color:#ff5500">This action cannot be undone.</strong>
+    </p>
+    <button class="modal-btn modal-confirm" id="btn-confirm-redeem" onclick="confirmRedeem()">
+      ✅ Yes, I'm at the Register
+    </button>
+    <button class="modal-btn modal-cancel" onclick="closeRedeemModal()">
+      ← Go Back
+    </button>
+  </div>
+</div>
+
+<!-- ── STATE 4a: CLAIMED (Permanent lockout receipt) ─────────────────────── -->
+<div id="s-claimed" class="screen">
+  <div class="brand-name">🔥 Hot Chickz</div>
+  <div class="brand-tagline">Redemption Complete</div>
+
+  <div class="steps">
+    <div class="step"><div class="step-dot done">✓</div><div class="step-label done">Claim</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-dot done">✓</div><div class="step-label done">Visit</div></div>
+    <div class="step-line"></div>
+    <div class="step"><div class="step-dot done">✓</div><div class="step-label done">Enjoy</div></div>
+  </div>
+
+  <div class="status-icon">✅</div>
+
+  <div class="receipt-box">
+    <h2>Offer Claimed!</h2>
+    <p>Your FREE Chicken Slider has been successfully redeemed.</p>
+    <div class="divider"></div>
+    <div class="receipt-row"><span>Item</span><span>FREE Chicken Slider ×1</span></div>
+    <div class="receipt-row"><span>Value</span><span>Complimentary</span></div>
+    <div class="receipt-row"><span>Status</span><span style="color:#38b46a;font-weight:700">✓ REDEEMED</span></div>
+    <div class="receipt-row"><span>Location</span><span>1716 E Pontiac St, Fort Wayne, IN</span></div>
+  </div>
+
+  <p style="color:#c97a55;font-size:0.9rem;line-height:1.6">
+    🙏 Thank you for visiting Hot Chickz!<br />We hope you loved your slider.
+  </p>
+
+  <div class="location-chip">📍 1716 E Pontiac St, Fort Wayne, IN 46803</div>
+</div>
+
+<!-- ── STATE 4b: EXPIRED (Permanent lockout) ─────────────────────────────── -->
+<div id="s-expired" class="screen">
+  <div class="brand-name">🔥 Hot Chickz</div>
+  <div class="brand-tagline">Fort Wayne, Indiana</div>
+  <div class="status-icon">⏰</div>
+  <div class="status-card">
+    <h2>Offer Expired</h2>
+    <p>Your 7-day window has passed. This link is no longer valid.<br /><br />Keep an eye on your messages for future promotions!</p>
+  </div>
+  <div class="location-chip">📍 1716 E Pontiac St, Fort Wayne, IN 46803</div>
+</div>
+
+<!-- ── INVALID / ERROR ────────────────────────────────────────────────────── -->
+<div id="s-invalid" class="screen">
+  <div class="brand-name">🔥 Hot Chickz</div>
+  <div class="brand-tagline">Fort Wayne, Indiana</div>
+  <div class="status-icon">⚠️</div>
+  <div class="status-card">
+    <h2>Invalid Link</h2>
+    <p>This link is invalid or unrecognized. Please check the SMS or email you received from Hot Chickz and try the link again.</p>
+  </div>
+  <div class="location-chip">📍 1716 E Pontiac St, Fort Wayne, IN 46803</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict'
+
+const API  = 'https://hotchickzredeem.onrender.com'
+
+// Support both ?code= and ?contact_id= (GHL may send either)
+const params = new URLSearchParams(window.location.search)
+const code   = params.get('code') || params.get('contact_id')
+
+let timerInterval = null
+
+/* ── Helpers ──────────────────────────────────────────────────────────────── */
+
+function show(id) {
+  const ids = ['s-loading','s-unclaimed','s-active','s-claimed','s-expired','s-invalid']
+  ids.forEach(s => {
+    const el = document.getElementById(s)
+    if (!el) return
+    el.style.display = (s === id) ? 'flex' : 'none'
+  })
+}
+
+function pad(n) { return String(n).padStart(2, '0') }
+
+function startCountdown(expiresAt) {
+  if (timerInterval) clearInterval(timerInterval)
+
+  function tick() {
+    const diff = new Date(expiresAt).getTime() - Date.now()
+    if (diff <= 0) {
+      clearInterval(timerInterval)
+      show('s-expired')
+      return
+    }
+    document.getElementById('t-days').textContent  = pad(Math.floor(diff / 86400000))
+    document.getElementById('t-hours').textContent = pad(Math.floor((diff / 3600000) % 24))
+    document.getElementById('t-mins').textContent  = pad(Math.floor((diff / 60000) % 60))
+    document.getElementById('t-secs').textContent  = pad(Math.floor((diff / 1000) % 60))
+  }
+
+  tick()
+  timerInterval = setInterval(tick, 1000)
+}
+
+/* ── State 1: Claim button ────────────────────────────────────────────────── */
+
+async function claimOffer() {
+  const btn = document.getElementById('btn-claim')
+  btn.disabled    = true
+  btn.textContent = 'Starting your offer…'
+
+  try {
+    const res = await fetch(API + '/api/start-timer', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ contact_id: code })
+    })
+
+    if (res.ok) {
+      const data = await res.json()
+      show('s-active')
+      startCountdown(data.expires_at)
+    } else {
+      // May have already been activated (race / double-tap) — re-fetch
+      await init()
+    }
+  } catch {
+    btn.disabled    = false
+    btn.textContent = '🔥 Claim Offer'
+    alert('Network error. Please check your connection and try again.')
+  }
+}
+
+/* ── State 3: Redeem modal ────────────────────────────────────────────────── */
+
+function openRedeemModal() {
+  document.getElementById('modal-redeem').style.display = 'flex'
+}
+
+function closeRedeemModal() {
+  document.getElementById('modal-redeem').style.display = 'none'
+}
+
+async function confirmRedeem() {
+  const btn = document.getElementById('btn-confirm-redeem')
+  btn.disabled    = true
+  btn.textContent = 'Processing…'
+
+  closeRedeemModal()
+
+  try {
+    const res = await fetch(API + '/api/redeem-offer', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ contact_id: code })
+    })
+
+    if (res.ok) {
+      if (timerInterval) clearInterval(timerInterval)
+      show('s-claimed')
+    } else {
+      const d = await res.json().catch(() => ({}))
+      // Re-enable modal button for retry
+      btn.disabled    = false
+      btn.textContent = '✅ Yes, I\'m at the Register'
+      alert(d.detail || 'Redemption failed. Please try again.')
+    }
+  } catch {
+    btn.disabled    = false
+    btn.textContent = '✅ Yes, I\'m at the Register'
+    alert('Network error. Please check your connection and try again.')
+  }
+}
+
+/* ── Init: load offer status and render correct state ─────────────────────── */
+
+async function init() {
+  show('s-loading')
+
+  if (!code) {
+    show('s-invalid')
+    return
+  }
+
+  try {
+    const res  = await fetch(API + '/api/offer-status?code=' + encodeURIComponent(code))
+
+    if (!res.ok) {
+      show('s-invalid')
+      return
+    }
+
+    const data = await res.json()
+
+    switch (data.status) {
+      case 'unclaimed':
+        show('s-unclaimed')
+        break
+
+      case 'active_timer':
+        if (data.expires_at) {
+          show('s-active')
+          startCountdown(data.expires_at)
+        } else {
+          show('s-invalid')
+        }
+        break
+
+      case 'claimed':
+        show('s-claimed')
+        break
+
+      case 'expired':
+        show('s-expired')
+        break
+
+      default:
+        show('s-invalid')
+    }
+  } catch {
+    show('s-invalid')
+  }
+}
+
+init()
+</script>
+</body>
+</html>
