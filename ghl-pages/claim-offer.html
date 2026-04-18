@@ -762,7 +762,7 @@ body::before {
   </div>
   <div class="loading-wrap">
     <div class="spinner-ring"></div>
-    <div class="loading-text">Loading your offer…</div>
+    <div id="loading-msg" class="loading-text">Loading your offer…</div>
   </div>
 </div>
 
@@ -1174,6 +1174,15 @@ async function confirmRedeem() {
   }
 }
 
+/* ── Helpers ─────────────────────────────────────────────────────────────── */
+
+function setLoadingMsg(msg) {
+  const el = document.getElementById('loading-msg')
+  if (el) el.textContent = msg
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)) }
+
 /* ── Init: load offer status and render correct state ─────────────────────── */
 
 async function init() {
@@ -1197,44 +1206,71 @@ async function init() {
     return
   }
 
-  try {
-    const res  = await fetch(API + '/api/offer-status?code=' + encodeURIComponent(code))
+  // Fire a wake-up ping immediately so the server starts booting
+  // while the user reads the loading screen (fire-and-forget)
+  fetch(API + '/health').catch(() => {})
 
-    if (!res.ok) {
-      show('s-invalid')
-      return
-    }
+  // Escalate the loading message if it takes a while (cold start)
+  const warmupTimer = setTimeout(() => setLoadingMsg('Server warming up — almost ready…'), 6000)
+  const slowTimer   = setTimeout(() => setLoadingMsg('This is taking a moment. Hang tight! ☕'), 18000)
 
-    const data = await res.json()
+  const MAX_RETRIES = 3
+  let lastError
 
-    switch (data.status) {
-      case 'unclaimed':
-        show('s-unclaimed')
-        break
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const res = await fetch(API + '/api/offer-status?code=' + encodeURIComponent(code))
 
-      case 'active_timer':
-        if (data.expires_at) {
-          show('s-active')
-          startCountdown(data.expires_at)
-        } else {
-          show('s-invalid')
-        }
-        break
+      clearTimeout(warmupTimer)
+      clearTimeout(slowTimer)
 
-      case 'claimed':
-        show('s-claimed')
-        break
-
-      case 'expired':
-        show('s-expired')
-        break
-
-      default:
+      if (!res.ok) {
         show('s-invalid')
+        return
+      }
+
+      const data = await res.json()
+
+      switch (data.status) {
+        case 'unclaimed':
+          show('s-unclaimed')
+          break
+
+        case 'active_timer':
+          if (data.expires_at) {
+            show('s-active')
+            startCountdown(data.expires_at)
+          } else {
+            show('s-invalid')
+          }
+          break
+
+        case 'claimed':
+          show('s-claimed')
+          break
+
+        case 'expired':
+          show('s-expired')
+          break
+
+        default:
+          show('s-invalid')
+      }
+      return  // success — exit
+
+    } catch (err) {
+      lastError = err
+      if (attempt < MAX_RETRIES) {
+        setLoadingMsg(`Network hiccup — retrying (${attempt}/${MAX_RETRIES - 1})…`)
+        await delay(5000 * attempt)  // 5s, then 10s
+      }
     }
-  } catch {
-    show('s-invalid')
   }
+
+  // All retries exhausted
+  clearTimeout(warmupTimer)
+  clearTimeout(slowTimer)
+  show('s-invalid')
 }
 
 init()
