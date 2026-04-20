@@ -187,226 +187,61 @@ body::before {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SLIDER ASSEMBLY ANIMATION
+   FLOATING FOOD BACKGROUND
 ═══════════════════════════════════════════════════════════════════ */
-.slider-assembly {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0;
-  width: 220px;
-  /* Float gently after assembly completes */
-  animation: sliderFloat 4s ease-in-out 3.4s infinite;
+#food-bg {
+  position: fixed; inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
 }
-@keyframes sliderFloat {
-  0%,100% { transform: translateY(0) rotate(0deg); }
-  40%     { transform: translateY(-10px) rotate(0.4deg); }
-  70%     { transform: translateY(-6px) rotate(-0.3deg); }
-}
-
-/* ── Top Bun ─────────────────────────────────────────────────────── */
-.sl-top-bun {
-  width: 168px; height: 62px;
-  background: linear-gradient(180deg, #f9ce50 0%, #eca030 50%, #d47828 100%);
-  border-radius: 100px 100px 8px 8px / 62px 62px 8px 8px;
-  box-shadow:
-    inset 0 8px 16px rgba(255,235,130,0.5),
-    inset 0 -5px 8px rgba(0,0,0,0.2),
-    0 5px 18px rgba(0,0,0,0.55);
-  position: relative; z-index: 6;
-  animation: bunCrown 0.9s ease 2.5s both;
-}
-/* Sesame seeds */
-.sl-top-bun::before {
-  content: '';
+.fp {
   position: absolute;
-  top: 46%; left: 50%; transform: translate(-50%, -50%);
-  width: 118px; height: 22px;
-  background-image:
-    radial-gradient(ellipse 9px 5px at 8px 10px,   #fde090 60%, transparent 61%),
-    radial-gradient(ellipse 8px 4px at 34px 6px,   #fde090 60%, transparent 61%),
-    radial-gradient(ellipse 10px 5px at 62px 11px, #fde090 60%, transparent 61%),
-    radial-gradient(ellipse 8px 4px at 90px 5px,   #fde090 60%, transparent 61%),
-    radial-gradient(ellipse 7px 4px at 112px 9px,  #fde090 60%, transparent 61%);
-  opacity: 0.55;
+  opacity: 0.08;
+  user-select: none;
+  line-height: 1;
+  will-change: transform;
 }
-
-/* ── Coleslaw ─────────────────────────────────────────────────────── */
-.sl-coleslaw {
-  width: 164px; height: 22px; border-radius: 3px;
-  background: linear-gradient(180deg, #fefae8 0%, #ede5c8 100%);
-  box-shadow: inset 0 -2px 5px rgba(200,175,110,0.45), 0 2px 7px rgba(0,0,0,0.4);
-  position: relative; z-index: 5;
-  margin-top: -2px; overflow: hidden;
-  animation: layerDrop 0.55s ease 2.0s both;
+@keyframes drift1 {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  25%  { transform: translate(70px,-50px) rotate(60deg); }
+  50%  { transform: translate(110px,40px) rotate(120deg); }
+  75%  { transform: translate(40px,90px) rotate(180deg); }
+  100% { transform: translate(0,0) rotate(360deg); }
 }
-.sl-coleslaw::before {
-  content: ''; position: absolute; inset: 0;
-  background-image:
-    linear-gradient(18deg,  transparent 40%, rgba(168,148,98,0.35) 41%, rgba(168,148,98,0.35) 43%, transparent 44%),
-    linear-gradient(-14deg, transparent 22%, rgba(180,158,108,0.28) 23%, rgba(180,158,108,0.28) 25%, transparent 26%),
-    linear-gradient(32deg,  transparent 57%, rgba(155,135,88,0.25) 58%, rgba(155,135,88,0.25) 60%, transparent 61%),
-    linear-gradient(-22deg, transparent 16%, rgba(165,143,93,0.22) 17%, rgba(165,143,93,0.22) 19%, transparent 20%),
-    linear-gradient(9deg,   transparent 70%, rgba(175,153,103,0.2) 71%, rgba(175,153,103,0.2) 73%, transparent 74%);
+@keyframes drift2 {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  25%  { transform: translate(-80px,50px) rotate(-55deg); }
+  50%  { transform: translate(-120px,-30px) rotate(-110deg); }
+  75%  { transform: translate(-50px,-90px) rotate(-200deg); }
+  100% { transform: translate(0,0) rotate(-360deg); }
 }
-
-/* ── Hot Chickz Sauce ─────────────────────────────────────────────── */
-.sl-sauce {
-  width: 162px; height: 14px;
-  border-radius: 2px 2px 4px 4px;
-  background:
-    radial-gradient(ellipse at 20% 40%, #ff7a1a 0%, transparent 55%),
-    radial-gradient(ellipse at 75% 30%, #ff3300 0%, transparent 48%),
-    linear-gradient(180deg, #ff4d00 0%, #cc2200 60%, #a01800 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(255,120,30,0.5),
-    inset 0 -1px 3px rgba(0,0,0,0.35),
-    0 2px 8px rgba(200,30,0,0.5);
-  position: relative; z-index: 4;
-  margin-top: -2px; overflow: hidden;
-  animation: sauceLand 0.5s ease 1.55s both;
+@keyframes drift3 {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  30%  { transform: translate(60px,80px) rotate(40deg); }
+  60%  { transform: translate(-30px,130px) rotate(100deg); }
+  100% { transform: translate(0,0) rotate(360deg); }
 }
-/* Glossy sheen */
-.sl-sauce::before {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(180deg, rgba(255,180,60,0.28) 0%, transparent 55%);
-  border-radius: inherit;
+@keyframes drift4 {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  33%  { transform: translate(-90px,-60px) rotate(-80deg); }
+  66%  { transform: translate(50px,-120px) rotate(-160deg); }
+  100% { transform: translate(0,0) rotate(-360deg); }
 }
-
-/* ── Chicken Patty ────────────────────────────────────────────────── */
-.sl-chicken {
-  width: 160px; height: 48px;
-  border-radius: 14px 11px 11px 14px;
-  background:
-    radial-gradient(ellipse at 27% 28%, #fdc060 0%, transparent 44%),
-    radial-gradient(ellipse at 76% 22%, #f0a040 0%, transparent 36%),
-    linear-gradient(150deg, #e89838 0%, #d47018 42%, #b85210 76%, #c86018 100%);
-  box-shadow:
-    inset 0 3px 9px rgba(255,200,78,0.45),
-    inset 0 -4px 8px rgba(0,0,0,0.3),
-    0 4px 16px rgba(0,0,0,0.55);
-  position: relative; z-index: 3;
-  margin-top: -2px;
-  animation: chickenLand 0.65s ease 1.0s both;
+@keyframes drift5 {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  20%  { transform: translate(40px,-100px) rotate(30deg); }
+  40%  { transform: translate(-20px,-160px) rotate(80deg); }
+  60%  { transform: translate(-80px,-80px) rotate(150deg); }
+  80%  { transform: translate(-40px,20px) rotate(250deg); }
+  100% { transform: translate(0,0) rotate(360deg); }
 }
-/* Crispy highlight bubbles */
-.sl-chicken::before {
-  content: ''; position: absolute; inset: 5px; border-radius: 10px;
-  background-image:
-    radial-gradient(circle 6px at 12% 45%, rgba(255,208,88,0.55) 0%, transparent 100%),
-    radial-gradient(circle 5px at 30% 25%, rgba(255,188,58,0.45) 0%, transparent 100%),
-    radial-gradient(circle 7px at 52% 65%, rgba(255,210,90,0.45) 0%, transparent 100%),
-    radial-gradient(circle 5px at 72% 30%, rgba(255,188,58,0.5)  0%, transparent 100%),
-    radial-gradient(circle 4px at 88% 55%, rgba(255,210,90,0.45) 0%, transparent 100%);
-}
-/* Grill lines */
-.sl-chicken::after {
-  content: ''; position: absolute; inset: 5px; border-radius: 10px;
-  background-image:
-    linear-gradient(172deg, transparent 34%, rgba(0,0,0,0.11) 35%, rgba(0,0,0,0.11) 37%, transparent 38%),
-    linear-gradient(172deg, transparent 55%, rgba(0,0,0,0.09) 56%, rgba(0,0,0,0.09) 58%, transparent 59%),
-    linear-gradient(172deg, transparent 73%, rgba(0,0,0,0.09) 74%, rgba(0,0,0,0.09) 76%, transparent 77%);
-}
-
-/* ── Pickles ──────────────────────────────────────────────────────── */
-.sl-pickles {
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  width: 162px; height: 22px;
-  margin-top: -2px; position: relative; z-index: 2;
-  animation: layerDrop 0.5s ease 0.5s both;
-}
-.sl-pickle {
-  width: 36px; height: 20px; border-radius: 50%;
-  background: radial-gradient(circle at 33% 33%, #90de60 0%, #4cb828 55%, #2a8010 100%);
-  box-shadow:
-    inset 0 3px 5px rgba(150,240,90,0.5),
-    inset 0 -2px 4px rgba(0,60,0,0.4),
-    0 2px 5px rgba(0,0,0,0.4);
-  position: relative;
-}
-.sl-pickle::after {
-  content: ''; position: absolute; inset: 4px; border-radius: 50%;
-  background: radial-gradient(circle at 30% 35%, rgba(255,255,255,0.18) 0%, transparent 45%);
-  border: 1px solid rgba(60,150,30,0.45);
-}
-
-/* ── Bottom Bun ───────────────────────────────────────────────────── */
-.sl-bottom-bun {
-  width: 180px; height: 34px;
-  background: linear-gradient(180deg, #d4843a 0%, #b5611f 55%, #9a4e10 100%);
-  border-radius: 5px 5px 90px 90px / 5px 5px 18px 18px;
-  box-shadow:
-    inset 0 3px 8px rgba(200,128,48,0.5),
-    inset 0 -5px 10px rgba(0,0,0,0.35),
-    0 6px 20px rgba(0,0,0,0.6);
-  position: relative; z-index: 1;
-  margin-top: -2px;
-  animation: plateLift 0.65s ease 0s both;
-}
-
-/* ── Layer keyframes (gravity-physics assembly) ─────────────────── */
-/* Bottom bun: plate gliding up naturally */
-@keyframes plateLift {
-  0%   { opacity: 0; transform: translateY(52px) scaleX(0.9); }
-  62%  { opacity: 1; transform: translateY(-5px) scaleX(1.045); }
-  80%  { transform: translateY(2px) scaleX(0.99); }
-  91%  { transform: translateY(-1px) scaleX(1.003); }
-  100% { opacity: 1; transform: translateY(0) scaleX(1); }
-}
-/* Middle layers: gravity-drop with landing squish and settle */
-@keyframes layerDrop {
-  0%   { opacity: 0; transform: translateY(-52px) scaleX(0.9); }
-  62%  { opacity: 1; transform: translateY(4px) scaleX(1.04); }
-  79%  { transform: translateY(-2px) scaleX(0.99); }
-  91%  { transform: translateY(1px) scaleX(1.003); }
-  100% { opacity: 1; transform: translateY(0) scaleX(1); }
-}
-/* Chicken: the star — bigger fall, more satisfying thud */
-@keyframes chickenLand {
-  0%   { opacity: 0; transform: translateY(-68px) scaleX(0.86); }
-  56%  { opacity: 1; transform: translateY(6px) scaleX(1.06); }
-  73%  { transform: translateY(-3px) scaleX(0.982); }
-  86%  { transform: translateY(1.5px) scaleX(1.008); }
-  94%  { transform: translateY(-0.5px) scaleX(0.999); }
-  100% { opacity: 1; transform: translateY(0) scaleX(1); }
-}
-/* Sauce: squeezes out horizontally then spreads as it lands */
-@keyframes sauceLand {
-  0%   { opacity: 0; transform: translateY(-20px) scaleX(0.2); }
-  55%  { opacity: 1; transform: translateY(1.5px) scaleX(1.1); }
-  75%  { transform: translateY(-0.5px) scaleX(0.97); }
-  100% { opacity: 1; transform: translateY(0) scaleX(1); }
-}
-/* Top bun: grand finale — big tilted drop with multi-bounce crown */
-@keyframes bunCrown {
-  0%   { opacity: 0; transform: translateY(-120px) rotate(-6deg) scaleX(0.82); }
-  48%  { opacity: 1; }
-  60%  { transform: translateY(9px) rotate(2.5deg) scaleX(1.075); }
-  74%  { transform: translateY(-5px) rotate(-1.2deg) scaleX(0.972); }
-  84%  { transform: translateY(3px) rotate(0.6deg) scaleX(1.014); }
-  92%  { transform: translateY(-1px) rotate(0deg) scaleX(0.997); }
-  100% { opacity: 1; transform: translateY(0) rotate(0deg) scaleX(1); }
-}
-
-/* ── Ingredient track badges ──────────────────────────────────────── */
-.ingredient-track {
-  display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
-  width: 100%;
-}
-.ing-badge {
-  font-size: 0.6rem; font-weight: 700; text-align: center;
-  line-height: 1.5; padding: 7px 10px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  color: var(--text-faint);
-  animation: ingActivate 2s ease var(--d) both;
-}
-@keyframes ingActivate {
-  0%   { opacity: 0; transform: scale(0.82) translateY(6px); border-color: var(--border); color: var(--text-faint); }
-  25%  { opacity: 1; transform: scale(1.07) translateY(0);   border-color: var(--brand);  color: var(--brand); }
-  60%  { opacity: 1; transform: scale(1);                    border-color: var(--green);  color: var(--green); }
-  100% { opacity: 1; transform: scale(1);                    border-color: var(--border); color: var(--text-dim); }
+@keyframes drift6 {
+  0%   { transform: translate(0,0) rotate(0deg); }
+  25%  { transform: translate(-60px,70px) rotate(90deg); }
+  50%  { transform: translate(80px,110px) rotate(180deg); }
+  75%  { transform: translate(100px,-40px) rotate(270deg); }
+  100% { transform: translate(0,0) rotate(360deg); }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -859,6 +694,38 @@ a.location-chip:hover { border-color: var(--brand); color: var(--text); }
 </head>
 <body>
 
+<div id="food-bg" aria-hidden="true">
+  <!-- Buns -->
+  <span class="fp" style="top:5%;left:8%;font-size:2.4rem;animation:drift1 18s linear infinite;animation-delay:-3s">🍞</span>
+  <span class="fp" style="top:72%;left:90%;font-size:1.8rem;animation:drift2 14s linear infinite;animation-delay:-7s">🍞</span>
+  <span class="fp" style="top:45%;left:55%;font-size:2rem;animation:drift4 22s linear infinite;animation-delay:-11s">🍞</span>
+  <span class="fp" style="top:88%;left:30%;font-size:1.5rem;animation:drift6 16s linear infinite;animation-delay:-2s">🍞</span>
+  <span class="fp" style="top:3%;left:50%;font-size:1.6rem;animation:drift3 22s linear infinite;animation-delay:-15s">🍞</span>
+  <!-- Chicken -->
+  <span class="fp" style="top:20%;left:78%;font-size:2.8rem;animation:drift2 20s linear infinite;animation-delay:-5s">🍗</span>
+  <span class="fp" style="top:60%;left:12%;font-size:2rem;animation:drift3 15s linear infinite;animation-delay:-9s">🍗</span>
+  <span class="fp" style="top:35%;left:42%;font-size:2.4rem;animation:drift5 24s linear infinite;animation-delay:-14s">🍗</span>
+  <span class="fp" style="top:90%;left:68%;font-size:1.6rem;animation:drift1 17s linear infinite;animation-delay:-1s">🍗</span>
+  <span class="fp" style="top:40%;left:95%;font-size:2rem;animation:drift4 18s linear infinite;animation-delay:-2s">🍗</span>
+  <!-- Pickles -->
+  <span class="fp" style="top:10%;left:35%;font-size:2rem;animation:drift3 19s linear infinite;animation-delay:-6s">🥒</span>
+  <span class="fp" style="top:55%;left:85%;font-size:1.6rem;animation:drift4 13s linear infinite;animation-delay:-10s">🥒</span>
+  <span class="fp" style="top:80%;left:5%;font-size:2.4rem;animation:drift6 21s linear infinite;animation-delay:-4s">🥒</span>
+  <span class="fp" style="top:28%;left:20%;font-size:1.8rem;animation:drift2 16s linear infinite;animation-delay:-12s">🥒</span>
+  <span class="fp" style="top:68%;left:22%;font-size:1.8rem;animation:drift1 20s linear infinite;animation-delay:-11s">🥒</span>
+  <!-- Coleslaw -->
+  <span class="fp" style="top:50%;left:30%;font-size:2.2rem;animation:drift1 23s linear infinite;animation-delay:-8s">🥗</span>
+  <span class="fp" style="top:15%;left:62%;font-size:1.7rem;animation:drift5 17s linear infinite;animation-delay:-13s">🥗</span>
+  <span class="fp" style="top:78%;left:50%;font-size:2rem;animation:drift3 20s linear infinite;animation-delay:-3s">🥗</span>
+  <span class="fp" style="top:92%;left:15%;font-size:1.5rem;animation:drift4 15s linear infinite;animation-delay:-16s">🥗</span>
+  <!-- Sauce -->
+  <span class="fp" style="top:38%;left:72%;font-size:2.2rem;animation:drift6 19s linear infinite;animation-delay:-5s">🌶️</span>
+  <span class="fp" style="top:65%;left:40%;font-size:1.8rem;animation:drift2 25s linear infinite;animation-delay:-9s">🌶️</span>
+  <span class="fp" style="top:8%;left:88%;font-size:2.6rem;animation:drift1 14s linear infinite;animation-delay:-7s">🌶️</span>
+  <span class="fp" style="top:82%;left:78%;font-size:1.6rem;animation:drift5 21s linear infinite;animation-delay:-18s">🌶️</span>
+  <span class="fp" style="top:22%;left:5%;font-size:2.2rem;animation:drift6 23s linear infinite;animation-delay:-6s">🌶️</span>
+</div>
+
 <!-- ══════════════════════════════════════════════════════════════════
      STATE: LOADING
 ═══════════════════════════════════════════════════════════════════ -->
@@ -883,29 +750,6 @@ a.location-chip:hover { border-color: var(--brand); color: var(--text); }
     <img class="brand-logo" src="https://raw.githubusercontent.com/Bharath-Maran/HotChickzRedeem/main/ghl-pages/HClogo.png" alt="Hot Chickz" />
     <div class="brand-name">Hot Chickz</div>
     <div class="brand-tagline">Fort Wayne, Indiana</div>
-  </div>
-
-  <!-- CSS slider assembly — builds bottom-up (plateLift→layerDrop×3→sauceLand→bunCrown) -->
-  <div class="slider-assembly">
-    <div class="sl-top-bun"></div>
-    <div class="sl-coleslaw"></div>
-    <div class="sl-sauce"></div>
-    <div class="sl-chicken"></div>
-    <div class="sl-pickles">
-      <div class="sl-pickle"></div>
-      <div class="sl-pickle"></div>
-      <div class="sl-pickle"></div>
-    </div>
-    <div class="sl-bottom-bun"></div>
-  </div>
-
-  <!-- Ingredient badges — each lights up as its layer lands -->
-  <div class="ingredient-track">
-    <div class="ing-badge" style="--d:0s">🍞<br>Bun</div>
-    <div class="ing-badge" style="--d:0.5s">🥒<br>Pickles</div>
-    <div class="ing-badge" style="--d:1.0s">🍗<br>Chicken</div>
-    <div class="ing-badge" style="--d:1.55s">🌶️<br>Hot Chickz Sauce</div>
-    <div class="ing-badge" style="--d:2.0s">🥗<br>Coleslaw</div>
   </div>
 
   <div class="voucher">
