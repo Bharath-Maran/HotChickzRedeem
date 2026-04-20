@@ -4,13 +4,20 @@ FastAPI + asyncpg  •  Supabase (PostgreSQL) backend
 
 Endpoints
 ---------
-GET  /health                         Health check
-GET  /api/claim-status?code=…        Query current redemption state
-GET  /api/offer-status?code=…        Alias (spec name) — same as claim-status
-POST /api/start-timer                Begin the 7-day claim window
-POST /api/register                   Manual pre-register (admin use)
-POST /api/redeem                     Complete the redemption at the register
-POST /api/redeem-offer               Alias (spec name) — same as redeem
+GET  /health                          Health check
+POST /api/pre-register                GHL workflow webhook: whitelist a contact
+GET  /api/status?code=…               Query current redemption state
+GET  /api/offer-status?code=…         Alias — same as /api/status
+GET  /api/claim-status?code=…         Alias — same as /api/status
+POST /api/start-timer                 Begin the 7-day claim window
+POST /api/redeem                      Complete the redemption at the register
+POST /api/redeem-offer                Alias — same as /api/redeem
+
+Table: offer_claims
+  contact_id       VARCHAR(255) PRIMARY KEY
+  status           VARCHAR(50)  DEFAULT 'unclaimed'  -- unclaimed | active_timer | claimed | expired
+  timer_started_at TIMESTAMP WITH TIME ZONE
+  expires_at       TIMESTAMP WITH TIME ZONE
 """
 
 import logging
@@ -19,9 +26,8 @@ import re
 from contextlib import asynccontextmanager
 
 import asyncpg
-import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, Header, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
@@ -43,17 +49,17 @@ ALLOWED_ORIGINS: list[str] = [
     if o.strip()
 ]
 
-# GoHighLevel API key — used to verify that an incoming contact_id is a real
-# GHL contact before allowing a claim. Without this, unknown IDs are rejected.
-# Obtain from GHL → Settings → API Keys (or Integrations → Private Integrations).
-GHL_API_KEY: str = os.getenv("GHL_API_KEY", "")
-if not GHL_API_KEY:
+# Shared secret between GHL workflow Action 1 and this API.
+# GHL workflow → Webhook action → Headers → Key: x-api-key | Value: <this>
+# Set PRE_REGISTER_API_KEY on Render → Environment to the same value.
+PRE_REGISTER_API_KEY: str = os.getenv("PRE_REGISTER_API_KEY", "")
+if not PRE_REGISTER_API_KEY:
     log.warning(
-        "GHL_API_KEY is not set. All offer-status requests for unknown contact "
-        "IDs will be rejected. Set this env var to enable GHL contact validation."
+        "PRE_REGISTER_API_KEY is not set — /api/pre-register is unprotected. "
+        "Set this env var on Render immediately."
     )
 
-# GHL contact IDs are alphanumeric + hyphens/underscores, up to 255 chars
+# GHL contact IDs: alphanumeric + hyphens/underscores, 1–255 chars
 _CONTACT_ID_RE = re.compile(r"^[A-Za-z0-9_-]{1,255}$")
 
 # ── Database pool ─────────────────────────────────────────────────────────────
@@ -114,25 +120,6 @@ def _validate_contact_id(contact_id: str) -> str:
     return contact_id
 
 
-async def _ghl_contact_exists(contact_id: str) -> bool:
-    """
-    Ask GoHighLevel whether the contact_id belongs to a real contact.
-    Returns False (deny) on any error so we fail closed, not open.
-    """
-    if not GHL_API_KEY:
-        return False
-    try:
-        async with httpx.AsyncClient(timeout=5.0) as client:
-            res = await client.get(
-                f"https://rest.gohighlevel.com/v1/contacts/{contact_id}",
-                headers={"Authorization": f"Bearer {GHL_API_KEY}"},
-            )
-            return res.status_code == 200
-    except Exception as exc:
-        log.error("GHL API contact-check failed for %s: %s", contact_id, exc)
-        return False
-
-
 # ── Schemas ───────────────────────────────────────────────────────────────────
 
 class ContactPayload(BaseModel):
@@ -153,55 +140,72 @@ async def health():
     return {"status": "ok"}
 
 
-@app.get("/api/claim-status")
-async def claim_status(code: str = Query(..., max_length=255)):
-    """
-    Return the current state for a GHL contact ID.
+# ─────────────────────────────────────────────────────────────────────────────
+# POST /api/pre-register  — The Bouncer
+#
+# Called by GHL workflow Action 1 immediately after the Facebook Lead Form is
+# submitted, BEFORE the SMS/email is sent. Whitelists the contact_id with
+# status 'unclaimed' so the frontend will accept it when the user clicks.
+#
+# Security: x-api-key header must match PRE_REGISTER_API_KEY.
+# Idempotent — safe to call multiple times for the same contact.
+# ─────────────────────────────────────────────────────────────────────────────
 
-    States returned: unclaimed | active_timer | claimed | expired
+@app.post("/api/pre-register")
+async def pre_register(
+    payload: ContactPayload,
+    x_api_key: str | None = Header(default=None),
+):
+    if PRE_REGISTER_API_KEY and x_api_key != PRE_REGISTER_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
-    Returns 404 if the contact ID was never registered via /api/register
-    (i.e. it was not sent by a genuine GHL workflow).
+    db = _require_pool()
+    async with db.acquire() as conn:
+        await conn.execute(
+            """
+            INSERT INTO offer_claims (contact_id, status)
+            VALUES ($1, 'unclaimed')
+            ON CONFLICT (contact_id) DO NOTHING
+            """,
+            payload.contact_id,
+        )
+    log.info("pre-register: whitelisted contact %s", payload.contact_id)
+    return {"status": "registered"}
 
-    Side-effects:
-    - Transitions 'active_timer' → 'expired' when the timer has elapsed.
-    """
+
+# ─────────────────────────────────────────────────────────────────────────────
+# GET /api/status  — The Checker
+#
+# Called by the frontend on page load to determine which screen to show.
+# Returns 404 for any contact_id not in the database (= fabricated link).
+# Automatically transitions active_timer → expired server-side.
+# ─────────────────────────────────────────────────────────────────────────────
+
+@app.get("/api/status")
+async def get_status(code: str = Query(..., max_length=255)):
     contact_id = _validate_contact_id(code)
     db = _require_pool()
 
     async with db.acquire() as conn:
         row = await conn.fetchrow(
-            "SELECT status, expires_at FROM slider_claims WHERE contact_id = $1",
+            "SELECT status, expires_at FROM offer_claims WHERE contact_id = $1",
             contact_id,
         )
 
+        # Not in DB → never pre-registered by GHL → fabricated link
         if row is None:
-            # Contact ID not in our DB yet. Verify it is a real GHL contact
-            # before creating a record — this blocks fabricated IDs.
-            contact_exists = await _ghl_contact_exists(contact_id)
-            if not contact_exists:
-                raise HTTPException(status_code=404, detail="Contact not found")
+            raise HTTPException(status_code=404, detail="Contact not found")
 
-            await conn.execute(
-                """
-                INSERT INTO slider_claims (contact_id, status)
-                VALUES ($1, 'unclaimed')
-                ON CONFLICT DO NOTHING
-                """,
-                contact_id,
-            )
-            return {"status": "unclaimed", "expires_at": None}
-
-        # Check for server-side expiry transition
+        # Server-side expiry transition
         if row["status"] == "active_timer":
             is_expired: bool = await conn.fetchval(
-                "SELECT NOW() > expires_at FROM slider_claims WHERE contact_id = $1",
+                "SELECT NOW() > expires_at FROM offer_claims WHERE contact_id = $1",
                 contact_id,
             )
             if is_expired:
                 await conn.execute(
                     """
-                    UPDATE slider_claims
+                    UPDATE offer_claims
                     SET status = 'expired'
                     WHERE contact_id = $1 AND status = 'active_timer'
                     """,
@@ -215,18 +219,31 @@ async def claim_status(code: str = Query(..., max_length=255)):
         }
 
 
+# Aliases — frontend calls /api/offer-status; both work without code changes
+@app.get("/api/offer-status")
+async def offer_status(code: str = Query(..., max_length=255)):
+    return await get_status(code=code)
+
+@app.get("/api/claim-status")
+async def claim_status(code: str = Query(..., max_length=255)):
+    return await get_status(code=code)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# POST /api/start-timer  — The Trigger
+#
+# Fired when the user taps "Claim My Free Slider".
+# Only succeeds when status is 'unclaimed' — prevents double-activation.
+# ─────────────────────────────────────────────────────────────────────────────
+
 @app.post("/api/start-timer")
 async def start_timer(payload: ContactPayload):
-    """
-    Begin the 7-day claim window.
-    Only succeeds when the current status is 'unclaimed'.
-    """
     db = _require_pool()
 
     async with db.acquire() as conn:
         result: str = await conn.execute(
             """
-            UPDATE slider_claims
+            UPDATE offer_claims
             SET status           = 'active_timer',
                 timer_started_at = NOW(),
                 expires_at       = NOW() + INTERVAL '7 days'
@@ -237,73 +254,38 @@ async def start_timer(payload: ContactPayload):
 
         if result == "UPDATE 0":
             row = await conn.fetchrow(
-                "SELECT status FROM slider_claims WHERE contact_id = $1",
+                "SELECT status FROM offer_claims WHERE contact_id = $1",
                 payload.contact_id,
             )
-            detail = "Contact not found" if row is None else f"Cannot start timer: status is '{row['status']}'"
+            detail = (
+                "Contact not found" if row is None
+                else f"Cannot start timer: status is '{row['status']}'"
+            )
             raise HTTPException(status_code=409, detail=detail)
 
         row = await conn.fetchrow(
-            "SELECT expires_at FROM slider_claims WHERE contact_id = $1",
+            "SELECT expires_at FROM offer_claims WHERE contact_id = $1",
             payload.contact_id,
         )
         return {"status": "active_timer", "expires_at": row["expires_at"].isoformat()}
 
 
-@app.get("/api/offer-status")
-async def offer_status(code: str = Query(..., max_length=255)):
-    """
-    Alias for /api/claim-status — used by the GHL funnel page.
-    """
-    return await claim_status(code=code)
-
-
-@app.post("/api/redeem-offer")
-async def redeem_offer(payload: ContactPayload):
-    """
-    Alias for /api/redeem — used by the GHL funnel page.
-    """
-    return await redeem(payload)
-
-
-@app.post("/api/register")
-async def register(payload: ContactPayload):
-    """
-    Manually pre-register a contact (admin / bulk-import use).
-    The primary path is automatic: /api/offer-status validates via GHL API
-    and creates the record on first visit.
-    """
-    db = _require_pool()
-
-    async with db.acquire() as conn:
-        await conn.execute(
-            """
-            INSERT INTO slider_claims (contact_id, status, timer_started_at, expires_at)
-            VALUES ($1, 'active_timer', NOW(), NOW() + INTERVAL '7 days')
-            ON CONFLICT (contact_id) DO UPDATE
-              SET status           = 'active_timer',
-                  timer_started_at = NOW(),
-                  expires_at       = NOW() + INTERVAL '7 days'
-            WHERE slider_claims.status = 'unclaimed'
-            """,
-            payload.contact_id,
-        )
-
-    return {"status": "registered", "expires_in_days": 7}
-
+# ─────────────────────────────────────────────────────────────────────────────
+# POST /api/redeem  — The Lockout
+#
+# Fired when the user confirms redemption at the register.
+# Only succeeds when status = 'active_timer' AND timer has not expired.
+# Once claimed the row is permanently locked — the link cannot be reused.
+# ─────────────────────────────────────────────────────────────────────────────
 
 @app.post("/api/redeem")
 async def redeem(payload: ContactPayload):
-    """
-    Mark the offer as claimed at the register.
-    Only succeeds when status is 'active_timer' AND the timer has not expired.
-    """
     db = _require_pool()
 
     async with db.acquire() as conn:
         result: str = await conn.execute(
             """
-            UPDATE slider_claims
+            UPDATE offer_claims
             SET status = 'claimed'
             WHERE contact_id = $1
               AND status     = 'active_timer'
@@ -314,7 +296,7 @@ async def redeem(payload: ContactPayload):
 
         if result == "UPDATE 0":
             row = await conn.fetchrow(
-                "SELECT status, expires_at FROM slider_claims WHERE contact_id = $1",
+                "SELECT status, expires_at FROM offer_claims WHERE contact_id = $1",
                 payload.contact_id,
             )
             if row is None:
@@ -322,9 +304,20 @@ async def redeem(payload: ContactPayload):
             if row["status"] == "claimed":
                 raise HTTPException(status_code=409, detail="Offer already claimed")
             if row["status"] == "expired" or (
-                row["expires_at"] and await conn.fetchval("SELECT NOW() > $1", row["expires_at"])
+                row["expires_at"] and await conn.fetchval(
+                    "SELECT NOW() > $1", row["expires_at"]
+                )
             ):
                 raise HTTPException(status_code=410, detail="Offer has expired")
-            raise HTTPException(status_code=409, detail=f"Cannot redeem: status is '{row['status']}'")
+            raise HTTPException(
+                status_code=409, detail=f"Cannot redeem: status is '{row['status']}'"
+            )
 
+        log.info("redeemed: contact %s", payload.contact_id)
         return {"status": "claimed"}
+
+
+# Alias — frontend calls /api/redeem-offer
+@app.post("/api/redeem-offer")
+async def redeem_offer(payload: ContactPayload):
+    return await redeem(payload)
