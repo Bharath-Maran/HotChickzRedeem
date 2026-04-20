@@ -8,7 +8,7 @@ GET  /health                         Health check
 GET  /api/claim-status?code=…        Query current redemption state
 GET  /api/offer-status?code=…        Alias (spec name) — same as claim-status
 POST /api/start-timer                Begin the 7-day claim window
-POST /api/register                   GHL webhook: pre-register + activate code
+POST /api/register                   Manual pre-register (admin use)
 POST /api/redeem                     Complete the redemption at the register
 POST /api/redeem-offer               Alias (spec name) — same as redeem
 """
@@ -19,8 +19,9 @@ import re
 from contextlib import asynccontextmanager
 
 import asyncpg
+import httpx
 from dotenv import load_dotenv
-from fastapi import FastAPI, Header, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, field_validator
 
@@ -42,13 +43,14 @@ ALLOWED_ORIGINS: list[str] = [
     if o.strip()
 ]
 
-# Webhook secret — GHL must send this in X-Webhook-Secret header when calling
-# /api/register. Prevents arbitrary contact IDs being registered by outsiders.
-REGISTER_WEBHOOK_SECRET: str = os.getenv("REGISTER_WEBHOOK_SECRET", "")
-if not REGISTER_WEBHOOK_SECRET:
+# GoHighLevel API key — used to verify that an incoming contact_id is a real
+# GHL contact before allowing a claim. Without this, unknown IDs are rejected.
+# Obtain from GHL → Settings → API Keys (or Integrations → Private Integrations).
+GHL_API_KEY: str = os.getenv("GHL_API_KEY", "")
+if not GHL_API_KEY:
     log.warning(
-        "REGISTER_WEBHOOK_SECRET is not set. "
-        "/api/register is unprotected — set this env var immediately."
+        "GHL_API_KEY is not set. All offer-status requests for unknown contact "
+        "IDs will be rejected. Set this env var to enable GHL contact validation."
     )
 
 # GHL contact IDs are alphanumeric + hyphens/underscores, up to 255 chars
@@ -112,6 +114,25 @@ def _validate_contact_id(contact_id: str) -> str:
     return contact_id
 
 
+async def _ghl_contact_exists(contact_id: str) -> bool:
+    """
+    Ask GoHighLevel whether the contact_id belongs to a real contact.
+    Returns False (deny) on any error so we fail closed, not open.
+    """
+    if not GHL_API_KEY:
+        return False
+    try:
+        async with httpx.AsyncClient(timeout=5.0) as client:
+            res = await client.get(
+                f"https://rest.gohighlevel.com/v1/contacts/{contact_id}",
+                headers={"Authorization": f"Bearer {GHL_API_KEY}"},
+            )
+            return res.status_code == 200
+    except Exception as exc:
+        log.error("GHL API contact-check failed for %s: %s", contact_id, exc)
+        return False
+
+
 # ── Schemas ───────────────────────────────────────────────────────────────────
 
 class ContactPayload(BaseModel):
@@ -155,10 +176,21 @@ async def claim_status(code: str = Query(..., max_length=255)):
         )
 
         if row is None:
-            # Contact ID was never registered by GHL — treat as invalid link.
-            # Do NOT auto-insert: that would let anyone claim a free slider
-            # with an arbitrary contact ID.
-            raise HTTPException(status_code=404, detail="Contact not found")
+            # Contact ID not in our DB yet. Verify it is a real GHL contact
+            # before creating a record — this blocks fabricated IDs.
+            contact_exists = await _ghl_contact_exists(contact_id)
+            if not contact_exists:
+                raise HTTPException(status_code=404, detail="Contact not found")
+
+            await conn.execute(
+                """
+                INSERT INTO slider_claims (contact_id, status)
+                VALUES ($1, 'unclaimed')
+                ON CONFLICT DO NOTHING
+                """,
+                contact_id,
+            )
+            return {"status": "unclaimed", "expires_at": None}
 
         # Check for server-side expiry transition
         if row["status"] == "active_timer":
@@ -235,18 +267,12 @@ async def redeem_offer(payload: ContactPayload):
 
 
 @app.post("/api/register")
-async def register(
-    payload: ContactPayload,
-    x_webhook_secret: str | None = Header(default=None),
-):
+async def register(payload: ContactPayload):
     """
-    Pre-register a contact from a GHL workflow webhook.
-    Requires the X-Webhook-Secret header to match REGISTER_WEBHOOK_SECRET.
-    Idempotent — safe to call multiple times for the same contact.
+    Manually pre-register a contact (admin / bulk-import use).
+    The primary path is automatic: /api/offer-status validates via GHL API
+    and creates the record on first visit.
     """
-    # Enforce webhook secret when one is configured
-    if REGISTER_WEBHOOK_SECRET and x_webhook_secret != REGISTER_WEBHOOK_SECRET:
-        raise HTTPException(status_code=401, detail="Unauthorized")
     db = _require_pool()
 
     async with db.acquire() as conn:
