@@ -186,7 +186,7 @@ body::before {
   gap: 0;
   width: 220px;
   /* Gentle hover float after assembly finishes */
-  animation: sliderFloat 3.5s ease-in-out 2.4s infinite;
+  animation: sliderFloat 3.5s ease-in-out 2.6s infinite;
 }
 @keyframes sliderFloat {
   0%,100% { transform: translateY(0); }
@@ -202,8 +202,8 @@ body::before {
     inset 0 8px 16px rgba(255,235,130,0.5),
     inset 0 -5px 8px rgba(0,0,0,0.2),
     0 5px 18px rgba(0,0,0,0.55);
-  position: relative; z-index: 5;
-  animation: asmDropBounce 0.65s cubic-bezier(0.34,1.52,0.64,1) 1.5s both;
+  position: relative; z-index: 6;
+  animation: asmDropBounce 0.65s cubic-bezier(0.34,1.52,0.64,1) 1.8s both;
 }
 /* Sesame seeds */
 .sl-top-bun::before {
@@ -220,36 +220,14 @@ body::before {
   opacity: 0.55;
 }
 
-/* ── Pickles ──────────────────────────────────────────────────────── */
-.sl-pickles {
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  width: 162px; height: 22px;
-  margin-top: -2px; position: relative; z-index: 4;
-  animation: asmSlideRight 0.5s cubic-bezier(0.34,1.4,0.64,1) 1.1s both;
-}
-.sl-pickle {
-  width: 36px; height: 20px; border-radius: 50%;
-  background: radial-gradient(circle at 33% 33%, #90de60 0%, #4cb828 55%, #2a8010 100%);
-  box-shadow:
-    inset 0 3px 5px rgba(150,240,90,0.5),
-    inset 0 -2px 4px rgba(0,60,0,0.4),
-    0 2px 5px rgba(0,0,0,0.4);
-  position: relative;
-}
-.sl-pickle::after {
-  content: ''; position: absolute; inset: 4px; border-radius: 50%;
-  background: radial-gradient(circle at 30% 35%, rgba(255,255,255,0.18) 0%, transparent 45%);
-  border: 1px solid rgba(60,150,30,0.45);
-}
-
 /* ── Coleslaw ─────────────────────────────────────────────────────── */
 .sl-coleslaw {
   width: 164px; height: 22px; border-radius: 3px;
   background: linear-gradient(180deg, #fefae8 0%, #ede5c8 100%);
   box-shadow: inset 0 -2px 5px rgba(200,175,110,0.45), 0 2px 7px rgba(0,0,0,0.4);
-  position: relative; z-index: 3;
+  position: relative; z-index: 5;
   margin-top: -2px; overflow: hidden;
-  animation: asmSlideLeft 0.5s cubic-bezier(0.34,1.4,0.64,1) 0.8s both;
+  animation: asmSlideLeft 0.5s cubic-bezier(0.34,1.4,0.64,1) 1.4s both;
 }
 .sl-coleslaw::before {
   content: ''; position: absolute; inset: 0;
@@ -259,6 +237,29 @@ body::before {
     linear-gradient(32deg,  transparent 57%, rgba(155,135,88,0.25) 58%, rgba(155,135,88,0.25) 60%, transparent 61%),
     linear-gradient(-22deg, transparent 16%, rgba(165,143,93,0.22) 17%, rgba(165,143,93,0.22) 19%, transparent 20%),
     linear-gradient(9deg,   transparent 70%, rgba(175,153,103,0.2) 71%, rgba(175,153,103,0.2) 73%, transparent 74%);
+}
+
+/* ── Hot Chickz Sauce ─────────────────────────────────────────────── */
+.sl-sauce {
+  width: 162px; height: 14px;
+  border-radius: 2px 2px 4px 4px;
+  background:
+    radial-gradient(ellipse at 20% 40%, #ff7a1a 0%, transparent 55%),
+    radial-gradient(ellipse at 75% 30%, #ff3300 0%, transparent 48%),
+    linear-gradient(180deg, #ff4d00 0%, #cc2200 60%, #a01800 100%);
+  box-shadow:
+    inset 0 2px 4px rgba(255,120,30,0.5),
+    inset 0 -1px 3px rgba(0,0,0,0.35),
+    0 2px 8px rgba(200,30,0,0.5);
+  position: relative; z-index: 4;
+  margin-top: -2px; overflow: hidden;
+  animation: asmSlideRight 0.5s cubic-bezier(0.34,1.4,0.64,1) 1.1s both;
+}
+/* Glossy sheen */
+.sl-sauce::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(255,180,60,0.28) 0%, transparent 55%);
+  border-radius: inherit;
 }
 
 /* ── Chicken Patty ────────────────────────────────────────────────── */
@@ -273,9 +274,9 @@ body::before {
     inset 0 3px 9px rgba(255,200,78,0.45),
     inset 0 -4px 8px rgba(0,0,0,0.3),
     0 4px 16px rgba(0,0,0,0.55);
-  position: relative; z-index: 2;
+  position: relative; z-index: 3;
   margin-top: -2px;
-  animation: asmDropDown 0.55s cubic-bezier(0.34,1.4,0.64,1) 0.4s both;
+  animation: asmDropDown 0.55s cubic-bezier(0.34,1.4,0.64,1) 0.8s both;
 }
 /* Crispy highlight bubbles */
 .sl-chicken::before {
@@ -294,6 +295,51 @@ body::before {
     linear-gradient(172deg, transparent 34%, rgba(0,0,0,0.11) 35%, rgba(0,0,0,0.11) 37%, transparent 38%),
     linear-gradient(172deg, transparent 55%, rgba(0,0,0,0.09) 56%, rgba(0,0,0,0.09) 58%, transparent 59%),
     linear-gradient(172deg, transparent 73%, rgba(0,0,0,0.09) 74%, rgba(0,0,0,0.09) 76%, transparent 77%);
+}
+
+/* ── Pickles ──────────────────────────────────────────────────────── */
+.sl-pickles {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  width: 162px; height: 22px;
+  margin-top: -2px; position: relative; z-index: 2;
+  animation: asmSlideLeft 0.5s cubic-bezier(0.34,1.4,0.64,1) 0.4s both;
+}
+.sl-pickle {
+  width: 36px; height: 20px; border-radius: 50%;
+  background: radial-gradient(circle at 33% 33%, #90de60 0%, #4cb828 55%, #2a8010 100%);
+  box-shadow:
+    inset 0 3px 5px rgba(150,240,90,0.5),
+    inset 0 -2px 4px rgba(0,60,0,0.4),
+    0 2px 5px rgba(0,0,0,0.4);
+  position: relative;
+}
+.sl-pickle::after {
+  content: ''; position: absolute; inset: 4px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 35%, rgba(255,255,255,0.18) 0%, transparent 45%);
+  border: 1px solid rgba(60,150,30,0.45),
+    linear-gradient(172deg, transparent 73%, rgba(0,0,0,0.09) 74%, rgba(0,0,0,0.09) 76%, transparent 77%);
+}
+
+/* ── Pickles ──────────────────────────────────────────────────────── */
+.sl-pickles {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  width: 162px; height: 22px;
+  margin-top: -2px; position: relative; z-index: 2;
+  animation: asmSlideLeft 0.5s cubic-bezier(0.34,1.4,0.64,1) 0.4s both;
+}
+.sl-pickle {
+  width: 36px; height: 20px; border-radius: 50%;
+  background: radial-gradient(circle at 33% 33%, #90de60 0%, #4cb828 55%, #2a8010 100%);
+  box-shadow:
+    inset 0 3px 5px rgba(150,240,90,0.5),
+    inset 0 -2px 4px rgba(0,60,0,0.4),
+    0 2px 5px rgba(0,0,0,0.4);
+  position: relative;
+}
+.sl-pickle::after {
+  content: ''; position: absolute; inset: 4px; border-radius: 50%;
+  background: radial-gradient(circle at 30% 35%, rgba(255,255,255,0.18) 0%, transparent 45%);
+  border: 1px solid rgba(60,150,30,0.45);
 }
 
 /* ── Bottom Bun ───────────────────────────────────────────────────── */
@@ -774,48 +820,56 @@ body::before {
 ═══════════════════════════════════════════════════════════════════ -->
 <div id="s-unclaimed" class="screen">
 
-  <div class="brand-wrap">
-    <div class="brand-name">🔥 Hot Chickz</div>
-    <div class="brand-tagline">Fort Wayne, Indiana</div>
-  </div>
-
-  <div class="steps-wrap">
-    <div class="step">
-      <div class="step-dot active">1</div>
-      <div class="step-label active">Claim</div>
-    </div>
-    <div class="step-connector"></div>
-    <div class="step">
-      <div class="step-dot">2</div>
-      <div class="step-label">Visit</div>
-    </div>
-    <div class="step-connector"></div>
-    <div class="step">
-      <div class="step-dot">3</div>
-      <div class="step-label">Enjoy</div>
-    </div>
-  </div>
-
-  <!-- CSS-drawn sandwich assembled layer by layer -->
+  <!-- Visual order top→bottom: top-bun / coleslaw / sauce / chicken / pickles / bottom-bun -->
+  <!-- Build order (animation delays): bottom-bun(0s) → pickles(0.4s) → chicken(0.8s) → sauce(1.1s) → coleslaw(1.4s) → top-bun(1.8s) -->
   <div class="slider-assembly">
     <div class="sl-top-bun"></div>
+    <div class="sl-coleslaw"></div>
+    <div class="sl-sauce"></div>
+    <div class="sl-chicken"></div>
     <div class="sl-pickles">
       <div class="sl-pickle"></div>
       <div class="sl-pickle"></div>
       <div class="sl-pickle"></div>
     </div>
-    <div class="sl-coleslaw"></div>
-    <div class="sl-chicken"></div>
     <div class="sl-bottom-bun"></div>
   </div>
 
   <!-- Ingredient roll-call badges — each activates with its layer -->
   <div class="ingredient-track">
-    <div class="ing-badge" style="--d:0s">🍞<br>Bottom Bun</div>
-    <div class="ing-badge" style="--d:0.4s">🍗<br>Chicken</div>
-    <div class="ing-badge" style="--d:0.8s">🥗<br>Coleslaw</div>
-    <div class="ing-badge" style="--d:1.1s">🥒<br>Pickles</div>
-    <div class="ing-badge" style="--d:1.5s">🍞<br>Top Bun</div>
+    <div class="ing-badge" style="--d:0s">🍞<br>Bun</div>
+    <div class="ing-badge" style="--d:0.4s">🥒<br>Pickles</div>
+    <div class="ing-badge" style="--d:0.8s">🍗<br>Chicken</div>
+    <div class="ing-badge" style="--d:1.1s">🌶️<br>H.C. Sauce</div>
+    <div class="ing-badge" style="--d:1.4s">🥗<br>Coleslaw</div>
+    <div class="ing-badge" style="--d:1.8s">🍞<br>
+    </div>
+  </div>
+
+  <!-- CSS-drawn sandwich assembled layer by layer -->
+  <!-- Visual order top→bottom: top-bun / coleslaw / sauce / chicken / pickles / bottom-bun -->
+  <!-- Build order (animation delays): bottom-bun(0s) → pickles(0.4s) → chicken(0.8s) → sauce(1.1s) → coleslaw(1.4s) → top-bun(1.8s) -->
+  <div class="slider-assembly">
+    <div class="sl-top-bun"></div>
+    <div class="sl-coleslaw"></div>
+    <div class="sl-sauce"></div>
+    <div class="sl-chicken"></div>
+    <div class="sl-pickles">
+      <div class="sl-pickle"></div>
+      <div class="sl-pickle"></div>
+      <div class="sl-pickle"></div>
+    </div>
+    <div class="sl-bottom-bun"></div>
+  </div>
+
+  <!-- Ingredient roll-call badges — each activates with its layer -->
+  <div class="ingredient-track">
+    <div class="ing-badge" style="--d:0s">🍞<br>Bun</div>
+    <div class="ing-badge" style="--d:0.4s">🥒<br>Pickles</div>
+    <div class="ing-badge" style="--d:0.8s">🍗<br>Chicken</div>
+    <div class="ing-badge" style="--d:1.1s">🌶️<br>H.C. Sauce</div>
+    <div class="ing-badge" style="--d:1.4s">🥗<br>Coleslaw</div>
+    <div class="ing-badge" style="--d:1.8s">🍞<br>Bun</div>
   </div>
 
   <div class="voucher">
