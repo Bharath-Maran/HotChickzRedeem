@@ -518,6 +518,29 @@ body::before {
   letter-spacing: 0.2px;
 }
 .location-chip span { color: var(--brand); font-size: 1rem; }
+a.location-chip { text-decoration: none; cursor: pointer; transition: var(--transition); }
+a.location-chip:hover { border-color: var(--brand); color: var(--text); }
+
+.promo-links {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+.promo-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 0.78rem; font-weight: 700;
+  color: var(--text-dim);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-chip);
+  padding: 8px 16px;
+  text-decoration: none;
+  letter-spacing: 0.2px;
+  transition: var(--transition);
+}
+.promo-link:hover { border-color: var(--brand); color: var(--text); }
 
 /* ═══════════════════════════════════════════════════════════════════
    COUNTDOWN BLOCK
@@ -886,8 +909,13 @@ body::before {
     🔥 &nbsp;Claim My Free Slider
   </button>
 
-  <div class="location-chip">
+  <a class="location-chip" href="https://maps.google.com/?q=1716+E+Pontiac+St,+Fort+Wayne,+IN+46803" target="_blank" rel="noopener">
     <span>📍</span> 1716 E Pontiac St, Fort Wayne, IN 46803
+  </a>
+
+  <div class="promo-links">
+    <a class="promo-link" href="https://hotchickz.com" target="_blank" rel="noopener">🌐&nbsp; hotchickz.com</a>
+    <a class="promo-link" href="https://www.doordash.com/store/hot-chickz-fort-wayne-25103116" target="_blank" rel="noopener">🛵&nbsp; Order on DoorDash</a>
   </div>
 
   <p class="fine-print">
@@ -976,8 +1004,13 @@ body::before {
     ✅ &nbsp;I'm at the Register — Redeem Now
   </button>
 
-  <div class="location-chip">
+  <a class="location-chip" href="https://maps.google.com/?q=1716+E+Pontiac+St,+Fort+Wayne,+IN+46803" target="_blank" rel="noopener">
     <span>📍</span> 1716 E Pontiac St, Fort Wayne, IN 46803
+  </a>
+
+  <div class="promo-links">
+    <a class="promo-link" href="https://hotchickz.com" target="_blank" rel="noopener">🌐&nbsp; hotchickz.com</a>
+    <a class="promo-link" href="https://www.doordash.com/store/hot-chickz-fort-wayne-25103116" target="_blank" rel="noopener">🛵&nbsp; Order on DoorDash</a>
   </div>
 
   <p class="fine-print">Dine-in only &nbsp;·&nbsp; One per customer &nbsp;·&nbsp; Cannot be combined with other offers</p>
@@ -1055,8 +1088,13 @@ body::before {
     </div>
   </div>
 
-  <div class="location-chip">
+  <a class="location-chip" href="https://maps.google.com/?q=1716+E+Pontiac+St,+Fort+Wayne,+IN+46803" target="_blank" rel="noopener">
     <span>📍</span> 1716 E Pontiac St, Fort Wayne, IN 46803
+  </a>
+
+  <div class="promo-links">
+    <a class="promo-link" href="https://hotchickz.com" target="_blank" rel="noopener">🌐&nbsp; hotchickz.com</a>
+    <a class="promo-link" href="https://www.doordash.com/store/hot-chickz-fort-wayne-25103116" target="_blank" rel="noopener">🛵&nbsp; Order on DoorDash</a>
   </div>
 
   <p style="font-size:0.88rem;color:var(--text-dim);line-height:1.75">
@@ -1081,7 +1119,11 @@ body::before {
     <h2>Offer Expired</h2>
     <p>Your 7-day redemption window has passed and this link is no longer valid.<br /><br />Keep an eye on your messages for future promotions!</p>
   </div>
-  <div class="location-chip"><span>📍</span> 1716 E Pontiac St, Fort Wayne, IN 46803</div>
+  <a class="location-chip" href="https://maps.google.com/?q=1716+E+Pontiac+St,+Fort+Wayne,+IN+46803" target="_blank" rel="noopener"><span>📍</span> 1716 E Pontiac St, Fort Wayne, IN 46803</a>
+  <div class="promo-links">
+    <a class="promo-link" href="https://hotchickz.com" target="_blank" rel="noopener">🌐&nbsp; hotchickz.com</a>
+    <a class="promo-link" href="https://www.doordash.com/store/hot-chickz-fort-wayne-25103116" target="_blank" rel="noopener">🛵&nbsp; Order on DoorDash</a>
+  </div>
   <div class="watermark">hotchickzoffer.com</div>
 </div>
 
@@ -1099,7 +1141,7 @@ body::before {
     <h2>Invalid Link</h2>
     <p>This link is invalid or unrecognized. Please check the SMS or email you received from Hot Chickz and use the original link.</p>
   </div>
-  <div class="location-chip"><span>📍</span> 1716 E Pontiac St, Fort Wayne, IN 46803</div>
+  <a class="location-chip" href="https://maps.google.com/?q=1716+E+Pontiac+St,+Fort+Wayne,+IN+46803" target="_blank" rel="noopener"><span>📍</span> 1716 E Pontiac St, Fort Wayne, IN 46803</a>
   <div class="watermark">hotchickzoffer.com</div>
 </div>
 
